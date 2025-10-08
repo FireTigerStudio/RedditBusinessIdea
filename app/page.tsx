@@ -30,26 +30,23 @@ export default function Home() {
     setPosts([]);
 
     try {
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Use client-side search instead of API route
+      const { performSearch } = await import('@/lib/client-search');
+      
+      const result = await performSearch(
+        formData.subreddit,
+        formData.keyword,
+        formData.mistralApiKey
+      );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to search posts');
-      }
-
-      setPosts(data.posts);
+      setPosts(result.posts);
       const newCount = RateLimiter.incrementSearchCount();
       setSearchCount(newCount);
 
-      if (data.posts.length === 0) {
-        setError(data.message || 'No posts found for your search criteria.');
+      if (result.message) {
+        setError(result.message);
+      } else if (result.posts.length === 0) {
+        setError('No posts found for your search criteria.');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
@@ -59,17 +56,9 @@ export default function Home() {
   };
 
   const handleFeedbackSubmit = async (feedbackData: FeedbackFormData) => {
-    try {
-      await fetch('/api/feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(feedbackData),
-      });
-    } catch (err) {
-      console.error('Failed to submit feedback:', err);
-    }
+    // Log feedback locally (API routes don't work in static export)
+    console.log('Feedback submitted:', feedbackData);
+    // In a real deployment, you could send this to an external service
   };
 
   if (showFeedback) {
