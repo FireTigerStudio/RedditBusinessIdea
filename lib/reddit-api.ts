@@ -9,34 +9,33 @@ export async function searchRedditPosts(
   try {
     console.log('Fetching posts from Reddit using public API...');
     
-    // Use Reddit's public JSON API (no authentication required)
-    const response = await axios.get<RedditApiResponse>(
-      `https://www.reddit.com/r/${subreddit}/search.json`,
+    // Use Reddit's public JSON API with CORS proxy
+    const proxyUrl = 'https://api.allorigins.win/get?url=';
+    const redditUrl = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(keyword)}&sort=top&t=week&limit=${limit}&restrict_sr=true`;
+    
+    const response = await axios.get(
+      `${proxyUrl}${encodeURIComponent(redditUrl)}`,
       {
-        params: {
-          q: keyword,
-          sort: 'top',
-          t: 'week', // Posts from the last week
-          limit: limit,
-          restrict_sr: 'true',
-        },
         headers: {
-          'User-Agent': 'RedditBusinessIdea/1.0.0',
+          'Content-Type': 'application/json',
         },
       }
     );
 
-    console.log(`Found ${response.data.data.children.length} posts from Reddit`);
+    // Parse the response from the proxy
+    const redditData = JSON.parse(response.data.contents) as RedditApiResponse;
 
-    const posts = response.data.data.children
-      .map(child => child.data)
-      .filter(post => 
+    console.log(`Found ${redditData.data.children.length} posts from Reddit`);
+
+    const posts = redditData.data.children
+      .map((child: any) => child.data)
+      .filter((post: any) => 
         post.selftext && 
         post.selftext.length > 50 && // Filter out very short posts
         !post.selftext.includes('[removed]') &&
         !post.selftext.includes('[deleted]')
       )
-      .sort((a, b) => b.ups - a.ups) // Sort by upvotes
+      .sort((a: any, b: any) => b.ups - a.ups) // Sort by upvotes
       .slice(0, 3); // Take top 3
 
     console.log(`Filtered to ${posts.length} quality posts`);
