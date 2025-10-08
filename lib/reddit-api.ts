@@ -9,21 +9,19 @@ export async function searchRedditPosts(
   try {
     console.log('Fetching posts from Reddit using public API...');
     
-    // Use Reddit's public JSON API with CORS proxy
-    const proxyUrl = 'https://api.allorigins.win/get?url=';
+    // Use a more reliable CORS proxy
+    const proxyUrl = 'https://corsproxy.io/?';
     const redditUrl = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(keyword)}&sort=top&t=week&limit=${limit}&restrict_sr=true`;
     
-    const response = await axios.get(
+    const response = await axios.get<RedditApiResponse>(
       `${proxyUrl}${encodeURIComponent(redditUrl)}`,
       {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        timeout: 10000, // 10 second timeout
       }
     );
 
-    // Parse the response from the proxy
-    const redditData = JSON.parse(response.data.contents) as RedditApiResponse;
+    // Direct response from corsproxy.io
+    const redditData = response.data;
 
     console.log(`Found ${redditData.data.children.length} posts from Reddit`);
 
