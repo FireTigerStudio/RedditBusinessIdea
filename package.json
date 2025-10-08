@@ -7,10 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "setup": "chmod +x setup.sh && ./setup.sh",
-    "pages:build": "npx @cloudflare/next-on-pages",
-    "preview": "npm run pages:build && wrangler pages dev",
-    "deploy": "npm run pages:build && wrangler pages deploy"
+    "setup": "chmod +x setup.sh && ./setup.sh"
   },
   "dependencies": {
     "next": "14.2.33",
@@ -27,8 +24,6 @@
   },
   "devDependencies": {
     "eslint": "^8",
-    "eslint-config-next": "14.0.3",
-    "@cloudflare/next-on-pages": "^1",
-    "wrangler": "^3"
+    "eslint-config-next": "14.0.3"
   }
 }
