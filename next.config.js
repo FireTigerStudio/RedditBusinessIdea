@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  trailingSlash: true,
   images: {
     domains: ['www.redditstatic.com', 'external-preview.redd.it'],
   },
